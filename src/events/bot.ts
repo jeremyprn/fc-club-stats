@@ -3,6 +3,7 @@ import { injectable } from 'tsyringe'
 
 import { CustomLogger } from '../services/logger.service.js'
 import { MusicManager } from '../services/music.service.js'
+import { ClubManager } from '../services/club.service.js'
 import { globalConfig } from '../config.js'
 
 
@@ -12,7 +13,8 @@ export class Bot {
 
     constructor(
         private logger: CustomLogger,
-        private musicManager: MusicManager
+        private musicManager: MusicManager,
+        private clubManager: ClubManager
     ) {}
 
 	@Once({
@@ -47,6 +49,7 @@ export class Bot {
             }
 
             this.musicManager.listen()
+            this.clubManager.listen();
             this.logger.info(botId ? `Bot "${botId}" started. GLHF!` : `Bot started. GLHF!`)
         } catch (err) {
             this.logger.error(err)

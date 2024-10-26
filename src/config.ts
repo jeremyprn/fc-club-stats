@@ -11,8 +11,8 @@ import type { MainOptions } from './utils/types.js'
 const logger = container.resolve(CustomLogger)
 
 export const CONSTANTS = {
-	version: '1.1.0',
-	discordjs: '14.14.1'
+	version: '1.0.0',
+	discordjs: '14.15.3'
 }
 
 const clientOptions: ClientOptions = {
@@ -37,32 +37,23 @@ const clientOptions: ClientOptions = {
     botGuilds: process.env.DEV_GUILD_ID && process.env.NODE_ENV === 'development' ? process.env.DEV_GUILD_ID.split(', ') : undefined
 }
 
-export const aiOptions: MainOptions['aiOptions'] = {
-    enabled: process.env.AI_ENABLED === "1" ? true : false,
-    chatpgtOptions: {
-        apiKey: process.env.CHAT_GPT_API_KEY!,
-        // debug: process.env.NODE_ENV === 'development' ? true : false,
-        systemMessage: `
-        You are fc-club-stats. Discord all-in-one bot for moderation, music & fun. Current date is ${new Date().toISOString()}.
-        There are several categories of commands: 'dev', 'info', 'fun', 'music', 'ai'. 
-        Users can get informations about them using command: /info commands <command_category>. Your developer is Witold Zawada
-        `,
-        // messageStore
-    }
-}
-
 const config = {
     token: process.env.BOT_TOKEN,
     devGuildId: process.env.DEV_GUILD_ID,
     ownerId: process.env.OWNER_ID,
     activity: {
-        name: 'Homsterix',
+        name: `s'accroupit au bord de la pelouse`,
         type: ActivityType.Playing
     }
+}
+
+export const clubOptions = {
+    clubID: process.env.FC_CLUB_ID,
+    clubPlatform: process.env.FC_CLUB_PLATFORM
 }
 
 export const globalConfig: MainOptions = {
     clientOptions,
     config,
-    aiOptions
+    clubOptions
 }

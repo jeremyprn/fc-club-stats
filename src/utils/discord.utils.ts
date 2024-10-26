@@ -1,8 +1,12 @@
 import { 
+    ButtonBuilder,
     ButtonInteraction,
     CacheType,
+    Channel,
     CommandInteraction, DiscordAPIError, GuildMember, InteractionReplyOptions, 
-    MessageComponentInteraction, VoiceBasedChannel 
+    MessageComponentInteraction, TextChannel, VoiceBasedChannel, ChannelType, 
+    TextBasedChannel,
+    EmbedBuilder
 } from 'discord.js'
 import { DisTubeError } from 'distube'
 
@@ -97,6 +101,26 @@ export class DiscordUtils {
 
         throw new Error(error as any)
     }
+
+    public static async sendTextSoundboard(channel: TextBasedChannel, components: any[]): Promise<void> {
+        // Vérifier si le canal existe et s'il s'agit d'un canal textuel
+        console.log("🚀 ~ DiscordUtils ~ sendMessage ~ channel:", channel)
+        if (channel && channel.isTextBased()) {
+            try {
+                // Envoyer le message dans le canal
+                await channel.send({
+                    content: 'Soundboard',
+                    components: components
+                });
+                
+            } catch (error) {
+                console.error(`Failed to send message: ${error}`);
+            }
+        } else {
+            console.error(`Channel with ID ${channel.id} not found or is not a text channel.`);
+        }
+    }
+    
 
 	public static getInteractionMember(interaction: CommandInteraction): GuildMember {
 		return (interaction.member ? interaction.member : interaction!.guild!.members!.me) as GuildMember

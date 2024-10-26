@@ -5,11 +5,17 @@ import { Client, DIService, tsyringeDependencyRegistryEngine } from "discordx";
 import { dirname, importx } from "@discordx/importer";
 import { autoInjectable, container, delay, inject } from "tsyringe";
 
-import type { MainOptions, MusicPlayerOptions } from "./utils/types.js";
+import type {
+	ClubOptions,
+	MainOptions,
+	MusicPlayerOptions,
+} from "./utils/types.js";
 import { globalConfig } from "./config.js";
 import { CustomLogger } from "./services/logger.service.js";
 import { ErrorHandler } from "./services/error-handler.service.js";
 import { MusicManager } from "./services/music.service.js";
+import { ClubManager } from "./services/club.service.js";
+import { SoundboardManager } from "./services/soundboard.service.js";
 
 @autoInjectable()
 export class Main {
@@ -19,7 +25,10 @@ export class Main {
 		public opts: MainOptions,
 		private logger?: CustomLogger,
 		private errorHandler?: ErrorHandler,
-		@inject(delay(() => MusicManager)) private musicManager?: MusicManager
+		@inject(delay(() => MusicManager)) private musicManager?: MusicManager,
+		@inject(delay(() => ClubManager)) private clubManager?: ClubManager,
+		@inject(delay(() => SoundboardManager)) private soundboardManager?: SoundboardManager
+		
 	) {
 		this.opts = opts;
 		this.client = new Client(this.opts.clientOptions);
@@ -44,6 +53,8 @@ export class Main {
 			tsyringeDependencyRegistryEngine.setInjector(container);
 		await this.errorHandler?.start();
 		await this.musicManager?.start();
+		await this.clubManager?.start();
+		await this.soundboardManager?.start();
 
 		const { token } = await this.checkEnvs();
 
@@ -64,6 +75,14 @@ export class Main {
 
 		if (!this.opts.clientOptions.botId) {
 			this.logger?.warn("No BOT_ID specified!");
+		}
+
+		if (!this.opts.clubOptions.clubID) {
+			this.logger?.warn("No CLUB_ID specified!");
+		}
+
+		if (!this.opts.clubOptions.clubPlatform) {
+			this.logger?.warn("No CLUB_PLATFORM specified!");
 		}
 
 		// NODE ENV = 'development' or 'production'
@@ -106,6 +125,18 @@ if (container.isRegistered("fc-club-stats")) {
 	container.register<MusicPlayerOptions>("musicOpts", {
 		useValue: {
 			client: fcClubStats.client,
+		},
+		
+	});
+	container.register<MusicPlayerOptions>("soundboardOpts", {
+		useValue: {
+			client: fcClubStats.client,
+		},
+	});
+	container.register<ClubOptions>("clubOpts", {
+		useValue: {
+			clubID: fcClubStats.opts.clubOptions.clubID,
+			clubPlatform: fcClubStats.opts.clubOptions.clubPlatform,
 		},
 	});
 }
